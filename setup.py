@@ -8,7 +8,7 @@ setup(
     description="A thread-safe logging manager for Python applications",
     long_description=open("README.md").read() if open("README.md", "r").readable() else "A thread-safe logging manager for Python applications",
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/logManager",  # Replace with your repo URL
+    url="https://github.com/hendriksen-mark/logManager",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
