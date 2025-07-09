@@ -8,7 +8,6 @@ class Logger:
         self.loggers = {}
         self.logLevel = logging.INFO  # Default to INFO level
         self._lock = threading.Lock()
-        self._configured = False
 
     @staticmethod
     def _get_log_format():
@@ -20,15 +19,12 @@ class Logger:
         with self._lock:
             self.logLevel = getattr(logging, level.upper(), logging.INFO)
             
-            # If already configured, update existing loggers
-            if self._configured:
-                for logger_name, logger in self.loggers.items():
-                    # Clear existing handlers
-                    logger.handlers.clear()
-                    # Re-setup with new level
-                    self._setup_logger_internal(logger_name, logger)
-            
-            self._configured = True
+            # Update all existing loggers with the new level
+            for logger_name, logger in self.loggers.items():
+                # Clear existing handlers
+                logger.handlers.clear()
+                # Re-setup with new level
+                self._setup_logger_internal(logger_name, logger)
 
     def _setup_logger_internal(self, name, logger=None):
         """Set up a logger with the given name."""
