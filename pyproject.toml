@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logManager"
+version = "1.0.0"
+authors = [
+    {name = "Mark Hendriksen", email = "your.email@example.com"}
+]
+description = "A thread-safe logging manager for Python applications"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = []
+
+[project.urls]
+"Homepage" = "https://github.com/yourusername/logManager"
+"Repository" = "https://github.com/yourusername/logManager.git"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["logManager*"]
