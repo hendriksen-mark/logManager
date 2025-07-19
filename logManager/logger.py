@@ -1,20 +1,24 @@
 import logging
+import logging.handlers
 import sys
 import threading
+from pathlib import Path
 
 
 class Logger:
-    def __init__(self):
-        self.loggers = {}
-        self.logLevel = logging.INFO  # Default to INFO level
-        self._lock = threading.Lock()
+    def __init__(self, log_file_path: Path = None):
+        self.loggers: dict[str, logging.Logger] = {}
+        self.logLevel: int = logging.INFO  # Default to INFO level
+        self._lock: threading.Lock = threading.Lock()
+        self._use_rolling: bool = False  # Flag to indicate if rolling file logging is used
+        self._log_file_path: Path = log_file_path  # Custom log file path
 
     @staticmethod
     def _get_log_format():
         """Return the log format for the logger."""
         return logging.Formatter('%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
 
-    def configure_logger(self, level):
+    def configure_logger(self, level: str):
         """Configure the logging level for all loggers."""
         with self._lock:
             self.logLevel = getattr(logging, level.upper(), logging.INFO)
@@ -26,7 +30,7 @@ class Logger:
                 # Re-setup with new level
                 self._setup_logger_internal(logger_name, logger)
 
-    def _setup_logger_internal(self, name, logger=None):
+    def _setup_logger_internal(self, name: str, logger: logging.Logger = None) -> logging.Logger:
         """Set up a logger with the given name."""
         if logger is None:
             logger = logging.getLogger(name)
@@ -43,6 +47,16 @@ class Logger:
         stderr_handler.setFormatter(self._get_log_format())
         stderr_handler.setLevel(logging.WARNING)
         logger.addHandler(stderr_handler)
+
+        # File handler for all levels
+        if self._use_rolling:
+            log_file_path = self._get_log_file_path()
+            file_handler = logging.handlers.RotatingFileHandler(
+                filename=str(log_file_path), maxBytes=10000000, backupCount=7)
+            file_handler.setFormatter(self._get_log_format())
+            file_handler.setLevel(logging.DEBUG)
+            file_handler.addFilter(lambda record: record.levelno <= logging.CRITICAL)
+            logger.addHandler(file_handler)
 
         # Set the logger level to the configured level
         logger.setLevel(self.logLevel)
@@ -63,3 +77,57 @@ class Logger:
     @staticmethod
     def hexstr(ba: bytearray) -> str:
         return " ".join([("0" + hex(b).replace("0x", ""))[-2:] for b in ba])
+
+    def _get_log_file_path(self):
+        """Get the log file path based on the main script name or custom path."""
+        if self._log_file_path:
+            return Path(self._log_file_path)
+        
+        # Get the main script name from sys.argv[0] or __main__ module
+        try:
+            import __main__
+            if hasattr(__main__, '__file__') and __main__.__file__:
+                main_script = Path(__main__.__file__)
+                log_file_name = main_script.stem + '.log'
+                return main_script.parent / log_file_name
+        except (AttributeError, ImportError):
+            pass
+        
+        # Fallback: try to get from sys.argv[0]
+        if sys.argv and sys.argv[0]:
+            main_script = Path(sys.argv[0])
+            if main_script.suffix == '.py':
+                log_file_name = main_script.stem + '.log'
+                return main_script.parent / log_file_name
+        
+        # Final fallback: use current working directory with generic name
+        return Path.cwd() / 'application.log'
+
+    def set_log_file_path(self, log_file_path):
+        """Set a custom log file path."""
+        with self._lock:
+            self._log_file_path = log_file_path
+            # Update all existing loggers with the new file path
+            for logger_name, logger in self.loggers.items():
+                # Clear existing handlers
+                logger.handlers.clear()
+                # Re-setup with new file path
+                self._setup_logger_internal(logger_name, logger)
+
+    def enable_file_logging(self, use_rolling=True):
+        """Enable file logging with optional rolling."""
+        with self._lock:
+            self._use_rolling = use_rolling
+            # Update all existing loggers
+            for logger_name, logger in self.loggers.items():
+                logger.handlers.clear()
+                self._setup_logger_internal(logger_name, logger)
+
+    def disable_file_logging(self):
+        """Disable file logging."""
+        with self._lock:
+            self._use_rolling = False
+            # Update all existing loggers to remove file handlers
+            for logger_name, logger in self.loggers.items():
+                logger.handlers.clear()
+                self._setup_logger_internal(logger_name, logger)

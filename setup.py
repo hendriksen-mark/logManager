@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="logManager",
-    version="1.0.1",
+    version="1.0.2",
     author="Mark Hendriksen",
     author_email="your.email@example.com",  # Replace with your email
     description="A thread-safe logging manager for Python applications",
