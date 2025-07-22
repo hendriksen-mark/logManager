@@ -15,16 +15,42 @@ A thread-safe logging manager for Python applications that provides easy configu
 
 ## Installation
 
-You can install this package directly from the repository:
+### Install from GitHub (Latest)
 
 ```bash
-pip install git+https://github.com/yourusername/logManager.git
+pip install git+https://github.com/hendriksen-mark/logManager.git
 ```
 
-Or add it to your `requirements.txt`:
+### Install Specific Version
+
+```bash
+# Install a specific release
+pip install git+https://github.com/hendriksen-mark/logManager.git@v1.0.2
+
+# Install from a specific branch
+pip install git+https://github.com/hendriksen-mark/logManager.git@main
+```
+
+### Add to requirements.txt
 
 ```
-git+https://github.com/yourusername/logManager.git
+# Latest version
+git+https://github.com/hendriksen-mark/logManager.git
+
+# Specific version (recommended for production)
+git+https://github.com/hendriksen-mark/logManager.git@v1.0.2
+```
+
+### Using with Poetry
+
+```bash
+poetry add git+https://github.com/hendriksen-mark/logManager.git
+```
+
+Or in `pyproject.toml`:
+```toml
+[tool.poetry.dependencies]
+logManager = {git = "https://github.com/hendriksen-mark/logManager.git", tag = "v1.0.2"}
 ```
 
 ## Usage
