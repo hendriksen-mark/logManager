@@ -58,8 +58,7 @@ class Logger:
             file_handler.addFilter(lambda record: record.levelno <= logging.CRITICAL)
             logger.addHandler(file_handler)
 
-        # Set the logger level to the configured level
-        logger.setLevel(self.logLevel)
+        logger.setLevel(logging.DEBUG)
         logger.propagate = False
         return logger
 
