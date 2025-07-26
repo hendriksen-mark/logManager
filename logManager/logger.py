@@ -21,21 +21,28 @@ class Logger:
     def configure_logger(self, level: str):
         """Configure the logging level for all loggers."""
         with self._lock:
-            self.logLevel = getattr(logging, level.upper(), logging.INFO)
-            changes_made: list[str] = []
+            old_configured_level = logging.getLevelName(self.logLevel)
+            new_level = getattr(logging, level.upper(), logging.INFO)
             
-            # Update all existing loggers with the new level
-            for logger_name, logger in self.loggers.items():
-                old_level = logger.level
-                # Clear existing handlers
-                logger.handlers.clear()
-                # Re-setup with new level
-                self._setup_logger_internal(logger_name, logger)
-                changes_made.append(f"Logger '{logger_name}' level changed from {logging.getLevelName(old_level)} to {level.upper()}")
+            # Only proceed if the level is actually changing
+            if self.logLevel != new_level:
+                self.logLevel = new_level
+                changes_made: list[str] = []
+                
+                # Update all existing loggers with the new level
+                for logger_name, logger in self.loggers.items():
+                    # Clear existing handlers
+                    logger.handlers.clear()
+                    # Re-setup with new level
+                    self._setup_logger_internal(logger_name, logger)
+                    changes_made.append(f"Logger '{logger_name}' level changed from {old_configured_level} to {level.upper()}")
 
-            if changes_made:
-                # Log the changes made to logger levels
-                return changes_made
+                if changes_made:
+                    # Log the changes made to logger levels
+                    return changes_made
+            
+            # Return None if no changes were made
+            return None
 
     def _setup_logger_internal(self, name: str, logger: logging.Logger = None) -> logging.Logger:
         """Set up a logger with the given name."""
