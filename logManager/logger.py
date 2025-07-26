@@ -22,13 +22,20 @@ class Logger:
         """Configure the logging level for all loggers."""
         with self._lock:
             self.logLevel = getattr(logging, level.upper(), logging.INFO)
+            changes_made: list[str] = []
             
             # Update all existing loggers with the new level
             for logger_name, logger in self.loggers.items():
+                old_level = logger.level
                 # Clear existing handlers
                 logger.handlers.clear()
                 # Re-setup with new level
                 self._setup_logger_internal(logger_name, logger)
+                changes_made.append(f"Logger '{logger_name}' level changed from {logging.getLevelName(old_level)} to {level.upper()}")
+
+            if changes_made:
+                # Log the changes made to logger levels
+                return changes_made
 
     def _setup_logger_internal(self, name: str, logger: logging.Logger = None) -> logging.Logger:
         """Set up a logger with the given name."""
@@ -58,6 +65,8 @@ class Logger:
             file_handler.addFilter(lambda record: record.levelno <= logging.CRITICAL)
             logger.addHandler(file_handler)
 
+        # Set logger level to DEBUG to allow all messages through to handlers
+        # Individual handlers will filter based on their own levels
         logger.setLevel(logging.DEBUG)
         logger.propagate = False
         return logger
