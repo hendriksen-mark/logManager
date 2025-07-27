@@ -3,6 +3,7 @@ import logging.handlers
 import sys
 import threading
 from pathlib import Path
+import colorlog
 
 
 class Logger:
@@ -14,9 +15,20 @@ class Logger:
         self._log_file_path: Path = log_file_path  # Custom log file path
 
     @staticmethod
-    def _get_log_format():
-        """Return the log format for the logger."""
-        return logging.Formatter('%(asctime)s - %(name)s - %(lineno)d - %(levelname)s - %(message)s')
+    def _get_log_format(disable_color: bool = False):
+        """Return the colored log format for the logger."""
+        return colorlog.ColoredFormatter(
+            '%(asctime)s - %(name)s - %(lineno)d - %(log_color)s%(levelname)s - %(message)s',
+            reset=True,
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': '',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'bold_red',
+            },
+            no_color=disable_color
+        )
 
     def configure_logger(self, level: str):
         """Configure the logging level for all loggers."""
@@ -67,7 +79,7 @@ class Logger:
             log_file_path = self._get_log_file_path()
             file_handler = logging.handlers.RotatingFileHandler(
                 filename=str(log_file_path), maxBytes=10000000, backupCount=7)
-            file_handler.setFormatter(self._get_log_format())
+            file_handler.setFormatter(self._get_log_format(True))
             file_handler.setLevel(logging.DEBUG)
             file_handler.addFilter(lambda record: record.levelno <= logging.CRITICAL)
             logger.addHandler(file_handler)
