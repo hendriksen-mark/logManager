@@ -75,30 +75,6 @@ jobs:
       with:
         tag_name: ${{ needs.build-package.outputs.latest_tag }}
         name: logManager ${{ needs.build-package.outputs.latest_tag }}
-        body: |
-          ## logManager ${{ needs.build-package.outputs.latest_tag }}
-          
-          ### 📦 Installation
-          
-          Install directly from GitHub:
-          ```bash
-          pip install git+https://github.com/hendriksen-mark/logManager.git@${{ needs.build-package.outputs.latest_tag }}
-          ```
-          
-          Or add to your `requirements.txt`:
-          ```
-          git+https://github.com/hendriksen-mark/logManager.git@${{ needs.build-package.outputs.latest_tag }}
-          ```
-          
-          ### 🔄 What's Changed
-          - Add your release notes here
-          
-          ### 📋 Features
-          - Thread-safe logging manager
-          - Automatic log file naming
-          - Configurable log levels
-          - Rolling file logging support
-          
         files: |
           *.tar.gz
           *.whl

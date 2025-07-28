@@ -54,7 +54,7 @@ class Logger:
                     return changes_made
             
             # Return None if no changes were made
-            return None
+            return "No changes made to logger levels"
 
     def _setup_logger_internal(self, name: str, logger: logging.Logger = None) -> logging.Logger:
         """Set up a logger with the given name."""
