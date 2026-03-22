@@ -3,16 +3,17 @@ import logging.handlers
 import sys
 import threading
 from pathlib import Path
+from typing import Optional
 import colorlog
 
 
 class Logger:
-    def __init__(self, log_file_path: Path = None):
+    def __init__(self, log_file_path: Optional[Path] = None):
         self.loggers: dict[str, logging.Logger] = {}
         self.logLevel: int = logging.INFO  # Default to INFO level
         self._lock: threading.Lock = threading.Lock()
         self._use_rolling: bool = False  # Flag to indicate if rolling file logging is used
-        self._log_file_path: Path = log_file_path  # Custom log file path
+        self._log_file_path: Optional[Path] = log_file_path  # Custom log file path
 
     @staticmethod
     def _get_log_format(disable_color: bool = False):
@@ -56,7 +57,7 @@ class Logger:
             # Return None if no changes were made
             return "No changes made to logger levels"
 
-    def _setup_logger_internal(self, name: str, logger: logging.Logger = None) -> logging.Logger:
+    def _setup_logger_internal(self, name: str, logger: Optional[logging.Logger] = None) -> logging.Logger:
         """Set up a logger with the given name."""
         if logger is None:
             logger = logging.getLogger(name)
