@@ -47,13 +47,6 @@ jobs:
         with:
           fetch-depth: 0 # Ensure all tags are fetched
 
-      - name: Create GitHub release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create ${{ needs.determine-next-tag.outputs.next_tag }} \
-            --latest
-
       - name: Create and push new tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
