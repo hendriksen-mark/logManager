@@ -27,7 +27,7 @@ def main():
     logger.critical("This is a critical message")
 
     print(f"Current log level: {logManager.logger.get_level_name()}")
-    print(f"Log file will be created at: {logManager.logger._get_log_file_path()}")
+    print(f"Log file will be created at: {logManager.logger.get_log_file_path()}")
 
 if __name__ == "__main__":
     main()

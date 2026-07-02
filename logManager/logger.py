@@ -77,7 +77,7 @@ class Logger:
 
         # File handler for all levels
         if self._use_rolling:
-            log_file_path = self._get_log_file_path()
+            log_file_path = self.get_log_file_path()
             file_handler = logging.handlers.RotatingFileHandler(
                 filename=str(log_file_path), maxBytes=10000000, backupCount=7)
             file_handler.setFormatter(self._get_log_format(True))
@@ -106,7 +106,7 @@ class Logger:
     def hexstr(ba: bytearray) -> str:
         return " ".join([("0" + hex(b).replace("0x", ""))[-2:] for b in ba])
 
-    def _get_log_file_path(self):
+    def get_log_file_path(self):
         """Get the log file path based on the main script name or custom path."""
         if self._log_file_path:
             return Path(self._log_file_path)

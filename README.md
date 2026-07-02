@@ -119,7 +119,7 @@ logger_manager.enable_file_logging(use_rolling=True)
 print(f"Current log level: {logger_manager.get_level_name()}")
 
 # Check where log file will be created
-print(f"Log file path: {logger_manager._get_log_file_path()}")
+print(f"Log file path: {logger_manager.get_log_file_path()}")
 
 # Use the hex string utility
 data = bytearray([0x48, 0x65, 0x6c, 0x6c, 0x6f])
