@@ -1,3 +1,6 @@
+"""
+logManager package initialization.
+"""
 from .logger import Logger
 
 # Create a global logger instance for convenience

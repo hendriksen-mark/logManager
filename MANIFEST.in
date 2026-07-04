@@ -1,4 +1,4 @@
 include README.md
 include LICENSE
 include pyproject.toml
-recursive-include logManager *.py
+recursive-include log_manager *.py

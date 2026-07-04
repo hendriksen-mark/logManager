@@ -1,16 +1,23 @@
+"""
+Logger module for logManager.
+"""
 import logging
 import logging.handlers
 import sys
 import threading
 from pathlib import Path
 from typing import Optional
+import __main__
 import colorlog
 
 
 class Logger:
+    """
+    A thread-safe logger manager that supports colored console output and optional file logging.
+    """
     def __init__(self, log_file_path: Optional[Path] = None):
         self.loggers: dict[str, logging.Logger] = {}
-        self.logLevel: int = logging.INFO  # Default to INFO level
+        self.log_level: int = logging.INFO  # Default to INFO level
         self._lock: threading.Lock = threading.Lock()
         self._use_rolling: bool = False  # Flag to indicate if rolling file logging is used
         self._log_file_path: Optional[Path] = log_file_path  # Custom log file path
@@ -34,26 +41,27 @@ class Logger:
     def configure_logger(self, level: str):
         """Configure the logging level for all loggers."""
         with self._lock:
-            old_configured_level = logging.getLevelName(self.logLevel)
+            old_lvl_name = logging.getLevelName(self.log_level)
             new_level = getattr(logging, level.upper(), logging.INFO)
-            
+            new_lvl_name = logging.getLevelName(new_level)
+
             # Only proceed if the level is actually changing
-            if self.logLevel != new_level:
-                self.logLevel = new_level
+            if self.log_level != new_level:
+                self.log_level = new_level
                 changes_made: list[str] = []
-                
+
                 # Update all existing loggers with the new level
                 for logger_name, logger in self.loggers.items():
                     # Clear existing handlers
                     logger.handlers.clear()
                     # Re-setup with new level
                     self._setup_logger_internal(logger_name, logger)
-                    changes_made.append(f"Logger '{logger_name}' level changed from {old_configured_level} to {level.upper()}")
+                    changes_made.append(f"Logger '{logger_name}' level changed from {old_lvl_name} to {new_lvl_name}")
 
                 if changes_made:
                     # Log the changes made to logger levels
                     return changes_made
-            
+
             # Return None if no changes were made
             return "No changes made to logger levels"
 
@@ -65,7 +73,7 @@ class Logger:
         # Stream handler for stdout (DEBUG, INFO)
         stdout_handler = logging.StreamHandler(sys.stdout)
         stdout_handler.setFormatter(self._get_log_format())
-        stdout_handler.setLevel(self.logLevel)
+        stdout_handler.setLevel(self.log_level)
         stdout_handler.addFilter(lambda record: record.levelno < logging.WARNING)
         logger.addHandler(stdout_handler)
 
@@ -100,34 +108,34 @@ class Logger:
 
     def get_level_name(self):
         """Get the name of the current logging level."""
-        return logging.getLevelName(self.logLevel)
-    
+        return logging.getLevelName(self.log_level)
+
     @staticmethod
     def hexstr(ba: bytearray) -> str:
+        """Convert a bytearray to a hex string."""
         return " ".join([("0" + hex(b).replace("0x", ""))[-2:] for b in ba])
 
     def get_log_file_path(self):
         """Get the log file path based on the main script name or custom path."""
         if self._log_file_path:
             return Path(self._log_file_path)
-        
+
         # Get the main script name from sys.argv[0] or __main__ module
         try:
-            import __main__
             if hasattr(__main__, '__file__') and __main__.__file__:
                 main_script = Path(__main__.__file__)
                 log_file_name = main_script.stem + '.log'
                 return main_script.parent / log_file_name
         except (AttributeError, ImportError):
             pass
-        
+
         # Fallback: try to get from sys.argv[0]
         if sys.argv and sys.argv[0]:
             main_script = Path(sys.argv[0])
             if main_script.suffix == '.py':
                 log_file_name = main_script.stem + '.log'
                 return main_script.parent / log_file_name
-        
+
         # Final fallback: use current working directory with generic name
         return Path.cwd() / 'application.log'
 

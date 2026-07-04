@@ -18,7 +18,7 @@ logManager.logger.configure_logger('DEBUG')
 logger: logging.Logger = logManager.logger.get_logger(__name__)
 
 def main():
-    
+    """Main function to demonstrate logging."""
     # Test different log levels
     logger.debug("This is a debug message")
     logger.info("This is an info message")

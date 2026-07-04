@@ -1,15 +1,24 @@
-from setuptools import setup, find_packages
+"""
+setup.py for logManager
+"""
+from setuptools import setup
+
+def readme():
+    """Read the README.md file for the long description."""
+    with open("README.md", "r", encoding="utf-8") as f:
+        return f.read()
 
 setup(
     name="logManager",
-    version="1.1.3",
+    version="1.1.4",
     author="Mark Hendriksen",
     author_email="your.email@example.com",  # Replace with your email
     description="A thread-safe logging manager for Python applications",
-    long_description=open("README.md").read() if open("README.md", "r").readable() else "A thread-safe logging manager for Python applications",
+    long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/hendriksen-mark/logManager",
-    packages=find_packages(),
+    packages=['logManager'],
+    package_dir={'logManager': 'log_manager'},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
